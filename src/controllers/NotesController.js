@@ -34,9 +34,9 @@ export class NotesController extends BaseController {
    */
   async deleteNote(request, response, next) {
     try {
-      // const userInfo = request.userInfo;
+      const userInfo = request.userInfo;
       const noteToDelete = request.params.noteId;
-      // noteToDelete.creatorId = userInfo.id;
+      noteToDelete.creatorId = userInfo.id;
       const message = await notesService.deleteNote(noteToDelete);
       response.send(message);
     } catch (error) {
