@@ -7,7 +7,8 @@ export class NotesController extends BaseController {
     super("api/notes");
     this.router
       .use(Auth0Provider.getAuthorizedUserInfo)
-      .post("", this.createNote);
+      .post("", this.createNote)
+      .delete("/:noteId", this.deleteNote);
   }
   /**
    * @param {import("express").Request} request,
@@ -21,6 +22,23 @@ export class NotesController extends BaseController {
       noteData.creatorId = userInfo.id;
       const newNote = await notesService.createNote(noteData);
       response.send(newNote);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * @param {import("express").Request} request,
+   * @param {import("express").Response} response,
+   * @param {import("express").NextFunction} next,
+   */
+  async deleteNote(request, response, next) {
+    try {
+      // const userInfo = request.userInfo;
+      const noteToDelete = request.params.noteId;
+      // noteToDelete.creatorId = userInfo.id;
+      const message = await notesService.deleteNote(noteToDelete);
+      response.send(message);
     } catch (error) {
       next(error);
     }
