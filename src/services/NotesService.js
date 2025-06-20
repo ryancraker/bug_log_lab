@@ -1,5 +1,5 @@
 import { dbContext } from "../db/DbContext.js";
-import { UnAuthorized } from "../utils/Errors.js";
+import { BadRequest } from "../utils/Errors.js";
 
 class NotesService {
   async createNote(noteData) {
