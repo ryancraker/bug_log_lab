@@ -14,9 +14,9 @@ class NotesService {
     );
     return notesForBug;
   }
-  async deleteNote(noteToDelete) {
+  async deleteNote(noteToDelete, userInfo) {
     const deleteNote = await dbContext.Notes.findById(noteToDelete);
-    if (deleteNote.creatorId != noteToDelete.creatorId) {
+    if (deleteNote.creatorId != userInfo.id) {
       throw new UnAuthorized("this ain't you're junk to trash!");
     }
     if (deleteNote == null) {

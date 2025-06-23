@@ -13,7 +13,8 @@ export class BugsController extends BaseController {
       .get("/:bugId", this.getBugById)
       .get("/:bugId/notes", this.getNotesForBug)
       .put("/:bugId", this.updateBug)
-      .delete("/:bugId", this.deleteBug);
+      .delete("/:bugId", this.deleteBug)
+      .get("/:bugId/trackedbugs", this.getUsersTrackingBug);
   }
   /**
    * @param {import("express").Request} request,
@@ -79,8 +80,10 @@ export class BugsController extends BaseController {
    */
   async updateBug(request, response, next) {
     try {
+      const userInfo = request.userInfo;
       const bugId = request.params.bugId;
       const bugUpdateInfo = request.body;
+      bugUpdateInfo.creatorId = userInfo.id;
       const bugToUpdate = await bugsService.updateBug(bugId, bugUpdateInfo);
       response.send(bugToUpdate);
     } catch (error) {
@@ -95,11 +98,31 @@ export class BugsController extends BaseController {
    */
   async deleteBug(request, response, next) {
     try {
+      const userInfo = request.userInfo;
       const bugId = request.params.bugId;
-      const message = await bugsService.deleteBug(bugId);
+      const message = await bugsService.deleteBug(bugId, userInfo);
       response.send(message);
     } catch (error) {
       next(error);
     }
+  }
+  /**
+   * @param {import("express").Request} request,
+   * @param {import("express").Response} response,
+   * @param {import("express").NextFunction} next,
+   */
+  async getUsersTrackingBug(request, response, next) {
+    try {
+      const userInfo = request.userInfo;
+      const bugId = request.params.bugId;
+      const usersTracking = await bugsService.getUsersTrackingBug(
+        bugId,
+        userInfo
+      );
+      response.send(usersTracking);
+    } catch {
+      error;
+    }
+    next(error);
   }
 }

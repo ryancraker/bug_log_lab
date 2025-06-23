@@ -1,5 +1,5 @@
 import { dbContext } from "../db/DbContext.js";
-import { BadRequest } from "../utils/Errors.js";
+import { BadRequest, UnAuthorized } from "../utils/Errors.js";
 
 class BugsService {
   async reportBug(bug) {
@@ -23,6 +23,9 @@ class BugsService {
   }
   async updateBug(bugId, bugUpdateInfo) {
     const bugToUpdate = await this.getBugById(bugId);
+    if (bugToUpdate.creatorId != bugUpdateInfo.creatorId) {
+      throw new UnAuthorized(`this ain't your junk to change`);
+    }
     bugToUpdate.title = bugUpdateInfo.title ?? bugToUpdate.title;
     bugToUpdate.description =
       bugUpdateInfo.description ?? bugToUpdate.description;
@@ -37,8 +40,11 @@ class BugsService {
     return bugToUpdate;
   }
 
-  async deleteBug(bugId) {
+  async deleteBug(bugId, userInfo) {
     const bugToDelete = await this.getBugById(bugId);
+    if (bugToDelete.id != userInfo.id) {
+      throw new UnAuthorized("this ain't your bug");
+    }
     await bugToDelete.deleteOne();
     return `${bugToDelete.title} has been removed from the queue`;
   }
